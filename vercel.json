@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "name": "mediid-backend-v2",
+  "name": "mediid-backend",
   "builds": [
     {
       "src": "server.js",

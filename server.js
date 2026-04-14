@@ -53,10 +53,6 @@ app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 // Routes
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/patients', require('./routes/patients'));
-app.use('/api/hospitals', require('./routes/hospitals'));
-app.use('/api/doctors', require('./routes/doctors'));
-app.use('/api/staff', require('./routes/staff'));
-app.use('/api/appointments', require('./routes/appointments'));
 app.use('/api/insurance', require('./routes/insurance'));
 app.use('/api/reports', require('./routes/reports'));
 app.use('/api/ocr', require('./routes/ocr'));
@@ -64,18 +60,6 @@ app.use('/api/marketplace', require('./routes/marketplace'));
 
 app.get('/api/health', (req, res) => res.json({ status: 'MediID API running', timestamp: new Date() }));
 
-// Manual Seeding Route - Visit this ONCE after deployment to create dummy users
-app.get('/api/seed', async (req, res) => {
-  try {
-    const result = await seedData();
-    res.json({ message: 'Seeding process completed', details: result });
-  } catch (err) {
-    console.error('❌ Manual seed failed:', err);
-    res.status(500).json({ error: 'Seed failed', message: err.message });
-  }
-});
-
-const seedData = require('./seed');
 const User = require('./models/User');
 
 if (process.env.NODE_ENV !== 'production') {
