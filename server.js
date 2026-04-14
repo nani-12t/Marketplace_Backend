@@ -78,10 +78,11 @@ app.get('/api/seed', async (req, res) => {
 const seedData = require('./seed');
 const User = require('./models/User');
 
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`🚀 MediID Server running on port ${PORT}`);
-  console.log(`📋 ID Format: Patient=MID-XXXXXXXX | Hospital=HID-XXXXXXXX | Doctor=HID-XXXX-DOC-0001 | Staff=HID-XXXX-STF-0001`);
-});
+if (process.env.NODE_ENV !== 'production') {
+  const PORT = process.env.PORT || 5000;
+  app.listen(PORT, () => {
+    console.log(`🚀 MediID Server running on port ${PORT}`);
+  });
+}
 
 module.exports = app;
