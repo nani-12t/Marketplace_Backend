@@ -32,6 +32,11 @@ router.post('/register', [
     const { email, password, role, firstName, lastName, phone } = req.body;
     console.log(`📝 Registration attempt for: ${email} (Role: ${role})`);
 
+    // Ensure DB connection
+    if (mongoose.connection.readyState === 0) {
+      await connectDB();
+    }
+
     const existing = await User.findOne({ email });
     if (existing) {
       console.log(`⚠️ Registration failed: Email ${email} already exists`);
