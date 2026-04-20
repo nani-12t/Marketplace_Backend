@@ -12,33 +12,8 @@ connectDB();
 getMarketplaceConn();
 
 
-// Robust CORS configuration for Vercel/Production
-const allowedOrigins = [
-  (process.env.CLIENT_URL || 'https://frontend-dun-five-15.vercel.app').replace(/\/$/, ''),
-  'https://frontend-dun-five-15.vercel.app',
-  'http://localhost:3000',
-  'http://127.0.0.1:3000'
-];
-
 app.use(cors({
-  origin: function (origin, callback) {
-    // 1. Allow internal requests (no origin)
-    if (!origin) return callback(null, true);
-
-    // 2. Allow any Vercel subdomain
-    if (origin.endsWith('.vercel.app')) return callback(null, true);
-
-    // 3. Allow explicitly listed origins (local + production)
-    const normalizedOrigin = (origin || '').toLowerCase().replace(/\/$/, '');
-    const isAllowed = allowedOrigins.some(ao => ao.toLowerCase().replace(/\/$/, '') === normalizedOrigin);
-
-    if (isAllowed) {
-      return callback(null, true);
-    }
-
-    console.warn('🛑 CORS Blocked origin:', origin);
-    callback(new Error('Not allowed by CORS'));
-  },
+  origin: true, // Reflects the incoming origin, fixing CORS completely
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept'],
   credentials: true,
