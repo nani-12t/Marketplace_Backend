@@ -12,41 +12,16 @@ connectDB();
 getMarketplaceConn();
 
 
-// Robust CORS configuration for Vercel/Production
-const allowedOrigins = [
-  (process.env.CLIENT_URL || 'https://frontend-dun-five-15.vercel.app').replace(/\/$/, ''),
-  'https://frontend-dun-five-15.vercel.app',
-  'http://localhost:3000',
-  'http://127.0.0.1:3000'
-];
-
-app.use(cors({
-  origin: function (origin, callback) {
-    // 1. Allow internal requests (no origin)
-    if (!origin) return callback(null, true);
-
-    // 2. Allow any Vercel subdomain
-    if (origin.endsWith('.vercel.app')) return callback(null, true);
-
-    // 3. Allow explicitly listed origins (local + production)
-    const normalizedOrigin = (origin || '').toLowerCase().replace(/\/$/, '');
-    const isAllowed = allowedOrigins.some(ao => ao.toLowerCase().replace(/\/$/, '') === normalizedOrigin);
-
-    if (isAllowed) {
-      return callback(null, true);
-    }
-
-    console.warn('🛑 CORS Blocked origin:', origin);
-    callback(new Error('Not allowed by CORS'));
-  },
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept'],
+// Clean dynamic CORS for Vercel and local development
+const corsOptions = {
+  origin: true, // Dynamically reflects whatever origin the request comes from
   credentials: true,
-  optionsSuccessStatus: 204
-}));
+  optionsSuccessStatus: 200, // Some legacy browsers (IE11, various SmartTVs) choke on 204
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept']
+};
 
-// Explicit OPTIONS preflight handling
-app.options('*', cors());
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
