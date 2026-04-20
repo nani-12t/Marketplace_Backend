@@ -9,25 +9,20 @@ const app = express();
 
 // Connect to Databases
 connectDB();
-getMarketplaceConn();
+const cors = require('cors');
 
+// For Local Development ONLY (Vercel Edge handles CORS in production via vercel.json)
+if (process.env.NODE_ENV !== 'production') {
+  app.use(cors({
+    origin: true,
+    credentials: true
+  }));
+}
 
-// Ultimate CORS Fix for Vercel Serverless
-app.use((req, res, next) => {
-  const origin = req.headers.origin || '*';
-  res.setHeader('Access-Control-Allow-Origin', origin);
-  res.setHeader('Access-Control-Allow-Credentials', 'true');
-  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
-  res.setHeader(
-    'Access-Control-Allow-Headers',
-    'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization'
-  );
-
-  // Intercept OPTIONS method
-  if (req.method === 'OPTIONS') {
-    return res.status(204).end();
-  }
-  next();
+// In production, Vercel consumes OPTIONS requests automatically or routes them here, 
+// so we return an empty 204 to satisfy preflight without duplicating headers.
+app.options('*', (req, res) => {
+  res.status(204).end();
 });
 
 app.use(express.json({ limit: '50mb' }));
