@@ -9,7 +9,6 @@ const app = express();
 
 // Connect to Databases
 connectDB();
-const cors = require('cors');
 
 // For Local Development ONLY (Vercel Edge handles CORS in production via vercel.json)
 if (process.env.NODE_ENV !== 'production') {
