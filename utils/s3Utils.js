@@ -4,10 +4,10 @@ const { PutObjectCommand } = require('@aws-sdk/client-s3');
 
 // Initialize S3 Client
 const s3Client = new S3Client({
-  region: process.env.AWS_REGION || 'ap-south-1',
+  region: process.env.DTP_AWS_REGION || 'ap-south-1',
   credentials: {
-    accessKeyId: process.env.AWS_ACCESS_KEY,
-    secretAccessKey: process.env.AWS_SECRET_KEY,
+    accessKeyId: process.env.DTP_AWS_ACCESS_KEY,
+    secretAccessKey: process.env.DTP_AWS_SECRET_KEY,
   },
 });
 
@@ -32,14 +32,14 @@ const generatePresignedUrl = async (fileName, fileType, user) => {
   const uniqueKey = `${prefix}${Date.now()}_${cleanFileName}`;
 
   const command = new PutObjectCommand({
-    Bucket: process.env.AWS_BUCKET_NAME,
+    Bucket: process.env.DTP_AWS_BUCKET_NAME,
     Key: uniqueKey,
     ContentType: fileType,
   });
 
   // URL expires in 5 minutes
   const presignedUrl = await getSignedUrl(s3Client, command, { expiresIn: 300 });
-  const finalUrl = `https://${process.env.AWS_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${uniqueKey}`;
+  const finalUrl = `https://${process.env.DTP_AWS_BUCKET_NAME}.s3.${process.env.DTP_AWS_REGION}.amazonaws.com/${uniqueKey}`;
 
   return { presignedUrl, finalUrl };
 };
