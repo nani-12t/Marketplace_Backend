@@ -10,19 +10,22 @@ const app = express();
 // Connect to Databases
 connectDB();
 
-// For Local Development ONLY (Vercel Edge handles CORS in production via vercel.json)
-if (process.env.NODE_ENV !== 'production') {
-  app.use(cors({
-    origin: true,
-    credentials: true
-  }));
-}
+// Handle CORS directly in Express for both local and production
+const allowedOrigins = [
+  'http://localhost:3000',
+  'https://marketplace-frontend-one-tau.vercel.app'
+];
 
-// In production, Vercel consumes OPTIONS requests automatically or routes them here, 
-// so we return an empty 204 to satisfy preflight without duplicating headers.
-app.options('*', (req, res) => {
-  res.status(204).end();
-});
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin) || origin.endsWith('.vercel.app')) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true
+}));
 
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
