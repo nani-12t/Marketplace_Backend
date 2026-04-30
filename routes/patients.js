@@ -3,6 +3,7 @@ const router  = express.Router();
 const Patient = require('../models/Patient');
 const { protect, authorize } = require('../middleware/auth');
 const { generateQRCode } = require('../utils/idGenerator');
+const { generatePresignedUrl } = require('../utils/s3Utils');
 
 // GET /api/patients/profile
 router.get('/profile', protect, authorize('patient'), async (req, res) => {
@@ -46,6 +47,24 @@ router.get('/scan/:uid', async (req, res) => {
     if (!patient) return res.status(404).json({ message: 'Patient not found' });
     res.json({ uid: patient.uid, name: `${patient.firstName} ${patient.lastName}`, emergency: patient.emergency });
   } catch (e) { res.status(500).json({ message: 'Server error' }); }
+});
+
+// GET /api/patients/documents/upload-url
+router.get('/documents/upload-url', protect, authorize('patient'), async (req, res) => {
+  try {
+    const { fileName, fileType } = req.query;
+    if (!fileName || !fileType) {
+      return res.status(400).json({ message: 'fileName and fileType are required' });
+    }
+
+    // req.user is populated by protect middleware
+    const { presignedUrl, finalUrl } = await generatePresignedUrl(fileName, fileType, req.user);
+    
+    res.json({ presignedUrl, finalUrl });
+  } catch (e) {
+    console.error('Error generating presigned URL:', e);
+    res.status(500).json({ message: 'Failed to generate upload URL' });
+  }
 });
 
 // POST /api/patients/documents
